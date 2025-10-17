@@ -1,0 +1,7 @@
+__pycache__
+./__pycache__
+databases/users.db
+databases/hotels.db
+databases/rooms.db
+.venv
+.vscode
