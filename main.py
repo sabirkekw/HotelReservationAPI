@@ -7,7 +7,7 @@ app = FastAPI()
 
 @app.get('/api/v1')
 async def root():
-    return JSONResponse({'message': 'Hotel Reservation API version 1.0'})
+    return JSONResponse({'message': 'Hotel Reservation API version 1.0'},status_code=200)
 
 app.include_router(auth_router)
 

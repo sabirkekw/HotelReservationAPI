@@ -1,17 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse, JSONResponse, Response
 from app.databases import database
-from app.models.validation_models import User, LoginData
-
-create_user_query = '''
-                CREATE TABLE IF NOT EXISTS users (
-                    user_id INTEGER PRIMARY KEY,
-                    name TEXT,
-                    surname TEXT,
-                    mail TEXT,
-                    password TEXT
-                )
-                '''
+import jwt
+from app.models.validation_models import User, LoginData, Token
+from app.auth.jwt_auth import get_password_hash, verify_password, create_access_token
 
 db_path = "app/databases/users.db"      
 
@@ -19,22 +11,21 @@ router = APIRouter(prefix='/api/v1/auth')
 
 @router.post("/register")
 async def register(data: User):
-    async with database.SQLDatabase(db_path) as db:
-        await db.create_database(create_user_query)
-
-        user_exists = await db.fetch_elem(data.mail, data.password)
-        if user_exists:
-            return JSONResponse({'message': f'Такой аккаунт уже существует!'}, status_code = 400)
+    async with database.UserDatabase(db_path) as db:
+        user_exists = await db.fetch_elem(data.mail)
+        if user_exists != ('_error'):
+            raise HTTPException(status_code=409, detail={"error": "USER_ALREADY_EXISTS",
+                                                          "message": "Такой аккаунт уже существует!"})
         
-        await db.add_elem(data.id, data.name, data.surname, data.mail, data.password)
-
-    return JSONResponse({'message': f'Вы зарегистрированы! Ваш id: {data.id}'})
+        await db.add_elem(data.id, data.name, data.surname, data.mail, get_password_hash(data.password))
+        return JSONResponse({'message': f'Вы зарегистрированы! Ваш id: {data.id}'}, status_code=201)
 
 @router.post("/login")
 async def login(data: LoginData):
-    async with database.SQLDatabase(db_path) as db:
-        user_exists = await db.fetch_elem(data.mail, data.password)
-        if user_exists:
-            return JSONResponse({'message': f'Вы успешно вошли в свой аккаунт!'})
+    async with database.UserDatabase(db_path) as db:
+        user_data = await db.fetch_elem(data.mail)
+        if verify_password(data.password, user_data[-1]):
+            token = create_access_token(user_data)
+            return JSONResponse({'message': f'Вы успешно вошли в свой аккаунт!', 'token': token}, status_code=200)
         
-        return JSONResponse({'message': f'Неверный логин/пароль!'}, status_code = 400)
+        raise HTTPException(status_code=401, detail={'error': "UNAUTHORIZED", 'message': f'Неверный логин/пароль!'})

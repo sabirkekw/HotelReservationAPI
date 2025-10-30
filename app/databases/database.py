@@ -16,10 +16,6 @@ class DatabaseConnection(ABC):
         await self.db.close()
 
     @abstractmethod
-    async def create_database(self,query):
-        pass
-
-    @abstractmethod
     async def add_elem(self, *args):
         pass
 
@@ -28,14 +24,9 @@ class DatabaseConnection(ABC):
         pass
 
 
-class SQLDatabase(DatabaseConnection):
+class UserDatabase(DatabaseConnection):
     def __init__(self,db_path):
         super().__init__(db_path)
-    
-    async def create_database(self, db_query):
-        async with self.lock:
-            await self.db.execute(db_query)
-            await self.db.commit()
 
     async def add_elem(self, user_id: int, name: str, surname: str, mail: str, password: str):
         async with self.lock:
@@ -44,12 +35,14 @@ class SQLDatabase(DatabaseConnection):
                 ''', (user_id, name, surname, mail, password))
             await self.db.commit()
 
-    async def fetch_elem(self, mail: str, password: str):
+    async def fetch_elem(self, mail: str):
         async with self.lock:
             async with self.db.execute(f'''
-                SELECT mail, password
+                SELECT *
                 FROM users
-                WHERE mail = ? AND password = ?
-                ''', (mail,password,)) as cursor:
+                WHERE mail = ?
+                ''', (mail,)) as cursor:
                 user_data = await cursor.fetchone()
-                return bool(user_data)
+                if user_data:
+                    return user_data
+                return ('_error')
