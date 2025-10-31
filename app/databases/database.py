@@ -1,48 +1,26 @@
-import asyncio
-import aiosqlite
-from abc import ABC, abstractmethod
+from sqlmodel import Field, SQLModel, create_engine, select, Session
+from app.models.validation_models import LoginData
 
-class DatabaseConnection(ABC):
-    def __init__(self, db_path):
-        self.db_path = db_path
-        self.lock = asyncio.Lock()
-        self.db = None
+class DatabaseUser(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    name: str
+    surname: str
+    mail: str
+    password: str
 
-    async def __aenter__(self):
-        self.db = await aiosqlite.connect(self.db_path)
-        return self
+sqlite_url = f"sqlite:///app/databases/users.db"
 
-    async def __aexit__(self, exc_type, exc_value, traceback):
-        await self.db.close()
+engine = create_engine(sqlite_url, echo=True, connect_args={"check_same_thread": False})
 
-    @abstractmethod
-    async def add_elem(self, *args):
-        pass
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
 
-    @abstractmethod
-    async def fetch_elem(self, *args):
-        pass
+def add_user(user: DatabaseUser, session: Session):
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    return user
 
-
-class UserDatabase(DatabaseConnection):
-    def __init__(self,db_path):
-        super().__init__(db_path)
-
-    async def add_elem(self, user_id: int, name: str, surname: str, mail: str, password: str):
-        async with self.lock:
-            await self.db.execute('''
-                INSERT INTO users (user_id, name, surname, mail, password) VALUES (?,?,?,?,?)
-                ''', (user_id, name, surname, mail, password))
-            await self.db.commit()
-
-    async def fetch_elem(self, mail: str):
-        async with self.lock:
-            async with self.db.execute(f'''
-                SELECT *
-                FROM users
-                WHERE mail = ?
-                ''', (mail,)) as cursor:
-                user_data = await cursor.fetchone()
-                if user_data:
-                    return user_data
-                return ('_error')
+def fetch_user(data: LoginData, session: Session):
+    user_data = session.exec(select(DatabaseUser).where(DatabaseUser.mail == data.mail))
+    return user_data.first()

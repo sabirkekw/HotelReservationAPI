@@ -1,5 +1,6 @@
 import jwt
 from os import getenv
+from app.models.validation_models import User
 from pwdlib import PasswordHash
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from dotenv import load_dotenv
@@ -19,16 +20,20 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return password_hash.hash(password)
 
-
-
 def create_access_token(data: tuple):
-    to_encode = dict()
-    to_encode["id"] = data[0]
-    to_encode["name"] = data[1]
-    to_encode["surname"] = data[2]
-    to_encode["mail"] = data[3]
-    to_encode["password"] = data[4]
+    user_model_keys = User.model_fields.keys()
+    to_encode = dict(zip(user_model_keys, data))
     expire = datetime.now(timezone.utc)+timedelta(minutes=TOKEN_TTL)
     to_encode["exp"] = expire
     print(to_encode)
     return jwt.encode(to_encode, SECRET_KEY, ALGORITHM)
+
+def verify_access_token(token):
+    header, payload, sign = token.split('.')
+    decoded_header = jwt.get_unverified_header(header)
+    encoding_algorithm = decoded_header['alg']
+    try:
+        jwt.decode(token,SECRET_KEY,algorithms=[encoding_algorithm])
+    except jwt.ExpiredSignatureError:
+        return False
+    return True
