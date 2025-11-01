@@ -1,10 +1,11 @@
 import uvicorn
-import app.dependencies.dependencies as dependencies
+from app.core.config import settings
+from app.api.v1.dependencies.dependencies import lifespan
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-from app.auth.auth import router as auth_router
+from app.api.v1.endpoints.auth import router as auth_router
 
-app = FastAPI(lifespan=dependencies.lifespan)
+app = FastAPI(title=settings.app_name,lifespan=lifespan)
 app.include_router(auth_router)
 
 @app.get('/api/v1')

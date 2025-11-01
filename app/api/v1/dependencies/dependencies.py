@@ -1,11 +1,11 @@
 from contextlib import asynccontextmanager
 from typing import Annotated
-from fastapi import FastAPI, Depends
+from fastapi import Depends
 from sqlmodel import Session
-from app.databases.database import engine, create_db_and_tables, SQLModel
+from app.api.v1.services.repository import engine, create_db_and_tables
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app):
     create_db_and_tables()
     
     yield
