@@ -28,8 +28,9 @@ class UserService():
         try:
             user_data = fetch_user(self.data, self.session)
             security = SecurityService(user_data)
+            security.get_password_hash()
             if security.verify_password():
-                token = security.create_access_token()
-                return JSONResponse({'message': f'Вы успешно вошли в свой аккаунт!', 'token': token}, status_code=200)
+                security.create_access_token()
+                return JSONResponse({'message': f'Вы успешно вошли в свой аккаунт!', 'token': security.token}, status_code=200)
         except AttributeError:
             raise HTTPException(status_code=401, detail={'error': "UNAUTHORIZED", 'message': f'Неверный логин/пароль!'})

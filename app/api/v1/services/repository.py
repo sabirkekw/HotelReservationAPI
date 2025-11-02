@@ -18,7 +18,6 @@ def add_user(user: DatabaseUser, session: Session):
 
 def fetch_user(data: LoginData, session: Session):
     user_data = session.exec(select(DatabaseUser).where(DatabaseUser.mail == data.mail))
-    print(user_data.first())
     return user_data.first()
 
 def to_database_user(user_data, hashed_password):
