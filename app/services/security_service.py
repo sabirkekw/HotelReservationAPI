@@ -8,23 +8,23 @@ SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm
 TOKEN_TTL = settings.token_ttl
 
-password_hash = PasswordHash.recommended()
-
-class SecurityService:
-    def __init__(self, data):
-        self.data = data
-        self.password = self.data.password
-
-    def get_password_hash(self):
-        self.password_hash =  password_hash.hash(self.password)
+class PasswordService:
+    def __init__(self):
+        self._password_hash = PasswordHash.recommended()
     
-    def verify_password(self):
-        return password_hash.verify(self.password, self.password_hash)
+    def hash(self,password):
+        return self._password_hash.hash(password)
 
-    def create_access_token(self):
+    def verify_password(self, password, hash):
+        return self._password_hash.verify(password, hash)
+    
+
+class TokenService:
+    def create_access_token(self, data):
         user_model_keys = User.model_fields.keys()
-        to_encode = dict(zip(user_model_keys, self.data))
+        to_encode = dict(zip(user_model_keys, data))
         to_encode["exp"] = datetime.now(timezone.utc)+timedelta(minutes=TOKEN_TTL)
+        to_encode["password"] = None
         self.token = jwt.encode(to_encode, SECRET_KEY, ALGORITHM)
 
     def verify_access_token(self):
