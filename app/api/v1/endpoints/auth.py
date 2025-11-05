@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 from app.models.schemas.auth import LoginData
 from app.models.schemas.user import User
 from app.api.v1.dependencies.dependencies import lifespan, get_registration_service, get_login_service
@@ -8,8 +9,9 @@ router = APIRouter(prefix='/api/v1/auth', lifespan=lifespan)
 
 @router.post("/register")
 async def register(data: User, registration_service = Depends(get_registration_service)):
-    return registration_service.register(data)
-
+    user_id = registration_service.register(data)
+    return JSONResponse(status_code=201, content={"message": f"Вы зарегистрированы! Ваш id: {user_id}"})
 @router.post("/login")
 async def login(data: LoginData, login_service = Depends(get_login_service)):
-    return login_service.login(data)
+    token = login_service.login(data)
+    return JSONResponse(status_code=201, content={"message": f"Вы успешно вошли в свой аккаунт!", "token": token})
