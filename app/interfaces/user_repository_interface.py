@@ -1,15 +1,16 @@
-from sqlmodel import select, Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.schemas.auth import LoginData
-from app.models.schemas.user import User
 from app.models.sqlmodels.user import DatabaseUser
 from abc import ABC, abstractmethod
 
 class UserRepository(ABC):
 
     @abstractmethod
-    def add_user(user: DatabaseUser, session: Session):
+    async def add_user(self, user: DatabaseUser, session: AsyncSession):
+        """Add a user to storage and return its id."""
         pass
 
     @abstractmethod
-    def fetch_user(data: LoginData, session: Session):
+    async def fetch_user(self, data: LoginData, session: AsyncSession):
+        """Fetch and return a user by login data (or None)."""
         pass

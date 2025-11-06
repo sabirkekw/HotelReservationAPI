@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     algorithm: str
     token_ttl: int
 
-    database_url: Optional[str] = "sqlite:///./users.db"
+    database_url: Optional[str] = "sqlite+aiosqlite:///./users.db"
     
     class Config:
         env_file = ".env"
