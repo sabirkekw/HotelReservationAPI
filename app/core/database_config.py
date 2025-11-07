@@ -6,11 +6,6 @@ from app.core.config import settings
 
 
 class Database:
-    """Database wrapper that holds engine and sessionmaker and exposes
-    `create_tables` and `get_session` as instance methods. This lets us pass
-    `database.get_session` directly to FastAPI's Depends as an async generator.
-    """
-
     def __init__(self, url: str):
         self.url = url
         self.engine: AsyncEngine = create_async_engine(self.url, echo=False)
@@ -27,11 +22,8 @@ class Database:
             yield session
 
 
-# Module-level instance used across the app
 database = Database(settings.database_url)
 
-# Backwards-compatible names (optional): other modules can still import
-# `create_tables`, `engine`, `get_session` if they expect module-level symbols.
 create_tables = database.create_tables
 get_session = database.get_session
 engine = database.engine
