@@ -2,7 +2,7 @@ from app.interfaces.hotels_repository_interface import HotelsRepository
 from motor.motor_asyncio import AsyncIOMotorClient
 
 class HotelsMongoRepository(HotelsRepository):
-    async def get_hotel(self, id: int, session):
+    async def get_hotel(self, id: int, session: AsyncIOMotorClient):
         hotel = await session.hotel_db.hotels.find_one({'_id': id})
         return hotel
 
