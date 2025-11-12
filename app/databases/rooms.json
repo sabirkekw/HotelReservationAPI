@@ -1,0 +1,92 @@
+[
+    {
+        "_id": 1,
+        "_hotel_id": 1,
+        "number": "101",
+        "type": "single",
+        "price": 75.0,
+        "amenities": ["wifi", "ac"],
+        "is_available": true,
+        "description": "Cozy single with sea view."
+    },
+    {
+        "_id": 2,
+        "_hotel_id": 1,
+        "number": "102",
+        "type": "double",
+        "price": 120.0,
+        "amenities": ["wifi", "ac", "balcony"],
+        "is_available": true,
+        "description": "Spacious double with balcony."
+    },
+    {
+        "_id": 3,
+        "_hotel_id": 1,
+        "number": "201",
+        "type": "suite",
+        "price": 220.0,
+        "amenities": ["wifi", "ac", "kitchen", "balcony"],
+        "is_available": false,
+        "description": "Luxury suite with kitchen and large balcony."
+    },
+    {
+        "_id": 4,
+        "_hotel_id": 2,
+        "number": "1A",
+        "type": "single",
+        "price": 60.0,
+        "amenities": ["heater", "wifi"],
+        "is_available": true,
+        "description": "Small single, warm and comfortable."
+    },
+    {
+        "_id": 5,
+        "_hotel_id": 2,
+        "number": "1B",
+        "type": "double",
+        "price": 95.0,
+        "amenities": ["heater", "fireplace"],
+        "is_available": true,
+        "description": "Charming double with fireplace."
+    },
+    {
+        "_id": 6,
+        "_hotel_id": 2,
+        "number": "2A",
+        "type": "family",
+        "price": 140.0,
+        "amenities": ["kitchen", "fireplace"],
+        "is_available": true,
+        "description": "Family room with extra bed."
+    },
+    {
+        "_id": 7,
+        "_hotel_id": 3,
+        "number": "301",
+        "type": "single",
+        "price": 55.0,
+        "amenities": ["wifi"],
+        "is_available": true,
+        "description": "Economy single."
+    },
+    {
+        "_id": 8,
+        "_hotel_id": 3,
+        "number": "302",
+        "type": "double",
+        "price": 90.0,
+        "amenities": ["wifi", "tv"],
+        "is_available": false,
+        "description": "Standard double with TV."
+    },
+    {
+        "_id": 9,
+        "_hotel_id": 3,
+        "number": "303",
+        "type": "suite",
+        "price": 180.0,
+        "amenities": ["wifi", "tv", "minibar"],
+        "is_available": true,
+        "description": "Business suite with minibar."
+    }
+]

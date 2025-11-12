@@ -5,6 +5,7 @@ class HotelsRepository(ABC):
     async def get_hotel():
         pass
 
+    @abstractmethod
     async def get_hotels():
         pass
     

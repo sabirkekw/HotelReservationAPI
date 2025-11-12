@@ -5,7 +5,7 @@ from typing import AsyncGenerator
 from app.core.config import settings
 
 
-class Database:
+class SQLDatabase:
     def __init__(self, url: str):
         self.url = url
         self.engine: AsyncEngine = create_async_engine(self.url, echo=False)
@@ -22,7 +22,7 @@ class Database:
             yield session
 
 
-database = Database(settings.database_url)
+database = SQLDatabase(settings.sql_database_url)
 
 create_tables = database.create_tables
 get_session = database.get_session

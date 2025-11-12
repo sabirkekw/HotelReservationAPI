@@ -1,0 +1,39 @@
+[
+    {
+        "_id": 1,
+        "name": "Seaside Resort",
+        "address": "1 Ocean Ave",
+        "city": "Coastville",
+        "rating": 4.6,
+        "amenities": [
+            "pool",
+            "spa",
+            "breakfast"
+        ],
+        "description": "A calm family-friendly resort by the sea."
+    },
+    {
+        "_id": 2,
+        "name": "Mountain Lodge",
+        "address": "77 Alpine Rd",
+        "city": "Highpeak",
+        "rating": 4.4,
+        "amenities": [
+            "hiking",
+            "sauna"
+        ],
+        "description": "Rugged lodge great for hikers and winter sports."
+    },
+    {
+        "_id": 3,
+        "name": "City Center Inn",
+        "address": "500 Main St",
+        "city": "Metrocity",
+        "rating": 4.1,
+        "amenities": [
+            "wifi",
+            "gym"
+        ],
+        "description": "Convenient location for business and tourism."
+    }
+]
