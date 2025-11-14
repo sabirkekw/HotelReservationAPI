@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from app.interfaces.hotels_repository_interface import HotelsRepository
+from app.interfaces.mongo_interface import HotelsRepository
 
 
 class HotelsMongoRepository(HotelsRepository):

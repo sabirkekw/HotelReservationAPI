@@ -3,7 +3,7 @@
 from typing import List, Optional
 
 from app.core.errors import NotFoundError
-from app.interfaces.hotels_repository_interface import HotelsRepository
+from app.interfaces.mongo_interface import HotelsRepository
 from motor.motor_asyncio import AsyncIOMotorClient
 
 
