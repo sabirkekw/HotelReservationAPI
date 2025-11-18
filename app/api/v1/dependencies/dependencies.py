@@ -9,15 +9,13 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from app.core.mongo_config import database as mongo_database
 from app.core.sql_config import database as sql_database
 
-from app.interfaces.mongo_interface import HotelsRepository
-from app.interfaces.rooms_repository_interface import RoomsRepository
-from app.interfaces.user_repository_interface import UserRepository
-from app.interfaces.bookings_repository_interface import BookingsRepository
+from app.interfaces.mongo_interface import MongoDBRepository
+from app.interfaces.sql_interface import SQLRepository
 
-from app.services.hotels_repository import HotelsMongoRepository
-from app.services.rooms_repository import RoomsMongoRepository
-from app.services.user_repository import UserSQLRepository
-from app.services.bookings_repository import BookingsMongoRepository
+from app.repos.hotels_repository import HotelsMongoRepository
+from app.repos.rooms_repository import RoomsMongoRepository
+from app.repos.user_repository import UserSQLRepository
+from app.repos.bookings_repository import BookingsMongoRepository
 
 from app.services.auth_service import LoginService, RegistrationService
 from app.services.hotels_service import HotelsService
@@ -53,7 +51,7 @@ def get_token_service() -> TokenService:
 # User repository
 
 
-def get_user_repository() -> UserRepository:
+def get_user_repository() -> SQLRepository:
     """Get user repository instance."""
     return UserSQLRepository()
 
@@ -63,7 +61,7 @@ def get_user_repository() -> UserRepository:
 
 def get_registration_service(
         session: AsyncSession = Depends(sql_database.get_session),
-        user_repo: UserRepository = Depends(get_user_repository),
+        user_repo: SQLRepository = Depends(get_user_repository),
         password_service: PasswordService = Depends(get_password_service)
 ) -> RegistrationService:
     """Get registration service instance."""
@@ -75,7 +73,7 @@ def get_registration_service(
 
 def get_login_service(
         session: AsyncSession = Depends(sql_database.get_session),
-        user_repo: UserRepository = Depends(get_user_repository),
+        user_repo: SQLRepository = Depends(get_user_repository),
         password_service: PasswordService = Depends(get_password_service),
         token_service: TokenService = Depends(get_token_service)
 ) -> LoginService:
@@ -86,7 +84,7 @@ def get_login_service(
 # Hotels repository
 
 
-def get_hotels_repository() -> HotelsRepository:
+def get_hotels_repository() -> MongoDBRepository:
     """Get hotels repository instance."""
     return HotelsMongoRepository()
 
@@ -96,7 +94,7 @@ def get_hotels_repository() -> HotelsRepository:
 
 def get_hotels_service(
         session: AsyncIOMotorClient = Depends(mongo_database.get_session),
-        hotel_repo: HotelsRepository = Depends(get_hotels_repository)
+        hotel_repo: MongoDBRepository = Depends(get_hotels_repository)
 ) -> HotelsService:
     """Get hotels service instance."""
     return HotelsService(session, hotel_repo)
@@ -105,7 +103,7 @@ def get_hotels_service(
 # Rooms repository
 
 
-def get_rooms_repository() -> RoomsRepository:
+def get_rooms_repository() -> MongoDBRepository:
     """Get rooms repository instance."""
     return RoomsMongoRepository()
 
@@ -115,8 +113,8 @@ def get_rooms_repository() -> RoomsRepository:
 
 def get_rooms_service(
         session: AsyncIOMotorClient = Depends(mongo_database.get_session),
-        hotels_repo: HotelsRepository = Depends(get_hotels_repository),
-        rooms_repo: RoomsRepository = Depends(get_rooms_repository)
+        hotels_repo: MongoDBRepository = Depends(get_hotels_repository),
+        rooms_repo: SQLRepository = Depends(get_rooms_repository)
 ) -> RoomsService:
     """Get rooms service instance."""
     return RoomsService(session, hotels_repo, rooms_repo)
@@ -125,7 +123,7 @@ def get_rooms_service(
 # Bookings repository
 
 
-def get_bookings_repository() -> BookingsRepository:
+def get_bookings_repository() -> MongoDBRepository:
     return BookingsMongoRepository()
 
 
@@ -134,7 +132,7 @@ def get_bookings_repository() -> BookingsRepository:
 
 def get_booking_service(
         session: AsyncIOMotorClient = Depends(mongo_database.get_session),
-        bookings_repo: BookingsRepository = Depends(get_bookings_repository),
+        bookings_repo: MongoDBRepository = Depends(get_bookings_repository),
         rooms_service: RoomsService = Depends(get_rooms_service),
         token_service: TokenService = Depends(get_token_service)
 ) -> BookingService:

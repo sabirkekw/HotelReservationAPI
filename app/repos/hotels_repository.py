@@ -1,39 +1,40 @@
-"""Hotels repository interface."""
+"""Hotels repository implementation for MongoDB."""
 
-from abc import ABC, abstractmethod
 from typing import List, Optional
 
 from motor.motor_asyncio import AsyncIOMotorClient
 
+from app.interfaces.mongo_interface import MongoDBRepository
 
-class MongoDBRepository(ABC):
-    """Repository interface for hotel, rooms and bookings data access."""
 
-    @abstractmethod
+class HotelsMongoRepository(MongoDBRepository):
+    """MongoDB implementation of HotelsRepository."""
     async def create(
             self,
             session: AsyncIOMotorClient,
             **kwargs
     ) -> Optional[dict]:
         """Create a single document."""
+        pass
 
-    @abstractmethod
     async def read_one(
             self,
             session: AsyncIOMotorClient,
             **kwargs
     ) -> Optional[dict]:
-        """Read a single document by id."""
+        """Get a single hotel by ID."""
+        hotel = await session.hotel_db.hotels.find_one({'_id': kwargs["hotel_id"]})
+        return hotel
 
-    @abstractmethod
     async def read_many(
             self,
-            *args,
-            session: AsyncIOMotorClient
+            session: AsyncIOMotorClient,
+            **kwargs
     ) -> List[dict]:
-        """Read all documents in collection."""
-
-    @abstractmethod
+        """Get all hotels."""
+        hotels = session.hotel_db.hotels.find()
+        return await hotels.to_list()
+    
     async def update(
             self,
             session: AsyncIOMotorClient,
@@ -41,7 +42,6 @@ class MongoDBRepository(ABC):
     ) -> Optional[dict]:
         """Update document info."""
     
-    @abstractmethod
     async def delete(
             self,
             session: AsyncIOMotorClient,

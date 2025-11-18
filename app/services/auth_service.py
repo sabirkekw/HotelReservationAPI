@@ -3,7 +3,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.errors import AuthenticationError, UserAlreadyExists
-from app.interfaces.user_repository_interface import UserRepository
+from app.interfaces.sql_interface import SQLRepository
 from app.models.schemas.auth import LoginData
 from app.models.schemas.user import User
 from app.services.security_service import PasswordService, TokenService
@@ -15,7 +15,7 @@ class RegistrationService:
     def __init__(
         self,
         session: AsyncSession,
-        user_repo: UserRepository,
+        user_repo: SQLRepository,
         password_service: PasswordService
     ) -> None:
         """Initialize service with dependencies."""
@@ -25,13 +25,13 @@ class RegistrationService:
 
     async def register(self, data: User) -> int:
         """Register a new user."""
-        db_user_data = await self.user_repo.fetch_user(data, self.session)
+        db_user_data = await self.user_repo.read_one(data, self.session)
 
         if db_user_data:
             raise UserAlreadyExists("Такой аккаунт уже существует!")
 
         hashed_password = await self.password_service.hash(data.password)
-        return await self.user_repo.add_user(
+        return await self.user_repo.create(
             data,
             self.session,
             hashed_password
@@ -44,7 +44,7 @@ class LoginService:
     def __init__(
         self,
         session: AsyncSession,
-        user_repo: UserRepository,
+        user_repo: SQLRepository,
         password_service: PasswordService,
         token_service: TokenService
     ) -> None:
@@ -56,7 +56,7 @@ class LoginService:
 
     async def login(self, data: LoginData) -> str:
         """Login user and return access token."""
-        db_user_data = await self.user_repo.fetch_user(data, self.session)
+        db_user_data = await self.user_repo.read_one(data, self.session)
         if db_user_data is None:
             raise AuthenticationError('Неверный логин/пароль!')
         if not await self.password_service.verify_password(

@@ -1,7 +1,7 @@
 """User repository interface."""
 
 from abc import ABC, abstractmethod
-from typing import Optional, List
+from typing import Optional, List, Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,24 +15,23 @@ class SQLRepository(ABC):
     @abstractmethod
     async def create(
         self,
-        user: DatabaseUser,
+        data: Any,
         session: AsyncSession,
-        hashed_password: str
-    ) -> Optional[int]:
+        hashed_password: str = None
+    ) -> int:
         """Add a new string to table."""
 
     @abstractmethod
     async def read_one(
         self,
-        data: LoginData,
+        data: Any,
         session: AsyncSession
-    ) -> Optional[DatabaseUser]:
+    ) -> Any:
         """Read single string."""
 
     @abstractmethod
     async def read_many(
         self,
-        data,
         session: AsyncSession
     ) -> List:
         """Read all strings from table."""
@@ -40,6 +39,15 @@ class SQLRepository(ABC):
     @abstractmethod
     async def update(
         self,
-        data,
+        data: Any,
         session: AsyncSession
-    ) -> Optional[]
+    ) -> Any:
+        """Update single string."""
+
+    @abstractmethod
+    async def delete(
+        self,
+        id: int,
+        session: AsyncSession
+    ) -> Any:
+        """Delete single string."""
