@@ -27,14 +27,16 @@ class BookingService:
         token_valid = await self.token_service.verify_access_token(token[7:])
         if not token_valid:
             raise AuthenticationError("Токен невалиден!")
-        
+
         room = await self.rooms_service.get_room(
-            booking_data._room_id,
-            booking_data._hotel_id) # raises 404 if room doesn't exists
+            room_id = booking_data.room_id,
+            hotel_id = booking_data.hotel_id
+        ) # raises 404 if room doesn't exists
 
         booking_id = await self.bookings_repo.create(
-            session=self.session,
-            booking_json = booking_data.model_dump())
+            session = self.session,
+            booking_json = booking_data.model_dump()
+        )
         
         return booking_id
         

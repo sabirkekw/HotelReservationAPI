@@ -13,7 +13,7 @@ class Hotel(BaseModel):
 
 class Room(BaseModel):
     _id: Optional[str]
-    _hotel_id: str
+    hotel_id: str
     number: int
     type: str
     price: int
@@ -23,8 +23,8 @@ class Room(BaseModel):
 
 class Booking(BaseModel):
     _id: Optional[str]
-    _hotel_id: str
-    _room_id: str
+    hotel_id: str
+    room_id: str
     user_mail: str
     time_start: datetime
     time_end: datetime

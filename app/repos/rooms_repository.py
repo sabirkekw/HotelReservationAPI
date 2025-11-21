@@ -35,9 +35,12 @@ class RoomsMongoRepository(MongoDBRepository):
             **kwargs
     ) -> Optional[dict]:
         """Get a single room by room ID and hotel ID."""
-        room = await session.hotel_db.rooms.find_one(
-            {'_id': ObjectId(kwargs['room_id']), '_hotel_id': ObjectId(kwargs['hotel_id'])}
-        )
+        room = await session.hotel_db.rooms.find_one({
+            '_id': ObjectId(kwargs['room_id']),
+            '_hotel_id': ObjectId(kwargs['hotel_id'])
+        })
+        if room is None:
+            return None
         return _convert_object_ids(room)
 
     async def read_many(
