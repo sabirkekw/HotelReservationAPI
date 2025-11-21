@@ -114,7 +114,7 @@ def get_rooms_repository() -> MongoDBRepository:
 def get_rooms_service(
         session: AsyncIOMotorClient = Depends(mongo_database.get_session),
         hotels_repo: MongoDBRepository = Depends(get_hotels_repository),
-        rooms_repo: SQLRepository = Depends(get_rooms_repository)
+        rooms_repo: MongoDBRepository = Depends(get_rooms_repository)
 ) -> RoomsService:
     """Get rooms service instance."""
     return RoomsService(session, hotels_repo, rooms_repo)

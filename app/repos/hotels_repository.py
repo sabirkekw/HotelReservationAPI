@@ -6,6 +6,22 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 from app.interfaces.mongo_interface import MongoDBRepository
 
+from app.models.schemas.hotel import Hotel
+
+from bson import ObjectId
+from typing import Any
+
+
+def _convert_object_ids(obj: Any) -> Any:
+    """Recursively convert any bson.ObjectId in a document to its string form."""
+    if isinstance(obj, ObjectId):
+        return str(obj)
+    if isinstance(obj, dict):
+        return {k: _convert_object_ids(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_convert_object_ids(v) for v in obj]
+    return obj
+
 
 class HotelsMongoRepository(MongoDBRepository):
     """MongoDB implementation of HotelsRepository."""
@@ -14,8 +30,8 @@ class HotelsMongoRepository(MongoDBRepository):
             session: AsyncIOMotorClient,
             **kwargs
     ) -> Optional[dict]:
-        """Create a single document."""
-        pass
+        hotel = await session.hotel_db.hotels.insert_one(kwargs['hotel_json'])
+        return str(hotel.inserted_id)
 
     async def read_one(
             self,
@@ -23,8 +39,10 @@ class HotelsMongoRepository(MongoDBRepository):
             **kwargs
     ) -> Optional[dict]:
         """Get a single hotel by ID."""
-        hotel = await session.hotel_db.hotels.find_one({'_id': kwargs["hotel_id"]})
-        return hotel
+        hotel = await session.hotel_db.hotels.find_one({"_id": ObjectId(kwargs["hotel_id"])})
+        if hotel is None:
+            return None
+        return _convert_object_ids(hotel)
 
     async def read_many(
             self,
@@ -33,7 +51,8 @@ class HotelsMongoRepository(MongoDBRepository):
     ) -> List[dict]:
         """Get all hotels."""
         hotels = session.hotel_db.hotels.find()
-        return await hotels.to_list()
+        docs = await hotels.to_list()
+        return [_convert_object_ids(d) for d in docs]
     
     async def update(
             self,

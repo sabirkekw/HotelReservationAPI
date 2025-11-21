@@ -4,14 +4,16 @@ from typing import List, Optional
 
 from motor.motor_asyncio import AsyncIOMotorClient
 
+from bson import ObjectId
+
 class BookingsMongoRepository(MongoDBRepository):
     async def create(
             self,
             session: AsyncIOMotorClient,
             **kwargs
     ) -> Optional[dict]:
-        """Create a single document."""
-        pass
+        booking = await session.hotel_db.bookings.insert_one(kwargs['booking_json'])
+        return booking.inserted_id
 
     async def read_one(
             self,
@@ -19,8 +21,8 @@ class BookingsMongoRepository(MongoDBRepository):
             **kwargs
     ) -> Optional[dict]:
         """Read a single document by id."""
-        room_data = await session.hotel_db.hotels.find_one({"_id": id})
-        return room_data
+        booking_data = await session.hotel_db.bookings.find_one({"_id": ObjectId(kwargs["booking_id"])})
+        return booking_data
     
     async def read_many(
             self,
@@ -28,8 +30,8 @@ class BookingsMongoRepository(MongoDBRepository):
             **kwargs
     ) -> List[dict]:
         """Read all documents in collection."""
-        rooms = session.hotel_db.hotels.find()
-        return await rooms.to_list()
+        bookings = session.hotel_db.bookings.find()
+        return await bookings.to_list()
 
 
     async def update(
