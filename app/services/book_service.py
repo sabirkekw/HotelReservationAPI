@@ -22,6 +22,8 @@ class BookingService:
     async def book_room(
             self,
             booking_data: Booking,
+            hotel_id: str,
+            room_id: str,
             token: str,
     ) -> str:
         token_valid = await self.token_service.verify_access_token(token[7:])
@@ -29,12 +31,14 @@ class BookingService:
             raise AuthenticationError("Токен невалиден!")
 
         room = await self.rooms_service.get_room(
-            room_id = booking_data.room_id,
-            hotel_id = booking_data.hotel_id
+            room_id = room_id,
+            hotel_id = hotel_id
         ) # raises 404 if room doesn't exists
 
         booking_id = await self.bookings_repo.create(
             session = self.session,
+            hotel_id = hotel_id,
+            room_id = room_id,
             booking_json = booking_data.model_dump()
         )
         

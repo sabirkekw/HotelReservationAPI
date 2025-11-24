@@ -1,13 +1,14 @@
 """Hotel endpoints for API v1."""
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Header
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from app.models.schemas.hotel import Hotel, Room
+from app.models.schemas.hotel import Hotel, Room, Booking
 
 from app.api.v1.dependencies.dependencies import (
     get_hotels_service,
-    get_rooms_service
+    get_rooms_service,
+    get_booking_service
 )
 
 router = APIRouter(prefix="/api/v1")
@@ -118,5 +119,30 @@ async def get_room(
         content={
             "message": f"Комната {room_id} в отеле {hotel_id}",
             "data": room_data
+        }
+    )
+
+@router.post("/hotels/{hotel_id}/rooms/{room_id}")
+async def create_booking(
+        booking_data: Booking,
+        hotel_id: str,
+        room_id: str,
+        authorization: str = Header(),
+        book_service=Depends(get_booking_service)
+) -> dict:
+    
+    """Create a new booking for a room."""
+
+    book_id = await book_service.book_room(
+        booking_data,
+        hotel_id,
+        room_id,
+        authorization
+    )
+    return JSONResponse(
+        status_code=201,
+        content={
+            "message": "Комната забронирована!",
+            "booking_id": str(book_id)
         }
     )

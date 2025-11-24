@@ -23,8 +23,6 @@ class Room(BaseModel):
 
 class Booking(BaseModel):
     _id: Optional[str]
-    hotel_id: str
-    room_id: str
     user_mail: str
     time_start: datetime
     time_end: datetime

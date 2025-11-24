@@ -12,7 +12,10 @@ class BookingsMongoRepository(MongoDBRepository):
             session: AsyncIOMotorClient,
             **kwargs
     ) -> Optional[dict]:
-        booking = await session.hotel_db.bookings.insert_one(kwargs['booking_json'])
+        booking_json = kwargs["booking_json"]
+        booking_json["_hotel_id"] = ObjectId(kwargs["hotel_id"])
+        booking_json["_room_id"] = ObjectId(kwargs["room_id"])
+        booking = await session.hotel_db.bookings.insert_one(booking_json)
         return booking.inserted_id
 
     async def read_one(

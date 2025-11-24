@@ -49,7 +49,9 @@ class RoomsMongoRepository(MongoDBRepository):
             **kwargs
     ) -> List[dict]:
         """Get all rooms for a hotel."""
-        rooms = session.hotel_db.rooms.find({'_hotel_id': ObjectId(kwargs['hotel_id'])})
+        rooms = session.hotel_db.rooms.find({
+            '_hotel_id': ObjectId(kwargs['hotel_id'])
+        })
         rooms_list = await rooms.to_list()
         return _convert_object_ids(rooms_list)
     
